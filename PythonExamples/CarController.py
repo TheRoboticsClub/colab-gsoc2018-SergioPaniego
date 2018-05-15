@@ -1,7 +1,7 @@
 # Function that reads ultrasound sensor and stops the car if the distance to an object is lower than 10cm
 def get_US():
     print()
-    print('Ultrasound sensor manager. Car will be stopped if you on a distance of 10cm or closer to an obstacle')
+    print('Ultrasound sensor manager. Car will be stopped if you are on a distance of 10cm or closer to an obstacle')
     distance = 11
     while distance > 10:
         try:
