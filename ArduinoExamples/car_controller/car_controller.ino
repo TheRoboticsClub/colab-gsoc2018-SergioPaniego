@@ -33,6 +33,35 @@ void setup() {
 }
 
 void loop() {
+  int distanceUS = getUS();
+  //Send result to serial monitor
+  if (distanceUS < 10) {
+    Serial.println((String)"STOP!! " + distanceUS + (String)" cm");
+    // Stop engines
+    setEngines(LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW);
+  } else {
+    Serial.println(distanceUS + (String)" cm");
+    // Forward engines
+    setEngines(LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH);
+  }
+}
+
+void setEngines(int leftFrontForward, int leftFrontBackward, int rightForntForward, int rightFrontBackward, 
+                int leftBackForward, int leftBackBackward, int rightBackForward, int rightBackBackward) {
+  digitalWrite(LEFT_FRONT_FORWARD , leftFrontForward);
+  digitalWrite(LEFT_FRONT_BACKWARD , leftFrontBackward);
+  
+  digitalWrite(RIGHT_FRONT_FORWARD , rightForntForward);
+  digitalWrite(RIGHT_FRONT_BACKWARD , rightFrontBackward);
+  
+  digitalWrite(LEFT_BACK_FORWARD , leftBackForward);
+  digitalWrite(LEFT_BACK_BACKWARD , leftBackBackward);
+  
+  digitalWrite(RIGHT_BACK_FORWARD , rightBackForward);
+  digitalWrite(RIGHT_BACK_BACKWARD , rightBackBackward);            
+}
+
+int getUS() {
   // Trigger pulse
   digitalWrite(triggerUS, LOW);
   delayMicroseconds(2);
@@ -47,46 +76,5 @@ void loop() {
   // Sound speed is 340 m/s | 29 ms/cm
   // We divide the pulse time by 58, time the sound wave takes to cover 1 cm
   distanceUS = timeUS / 58;
-
-  //Send result to serial monitor
-  if (distanceUS < 10) {
-    Serial.print("STOP!! ");
-    Serial.print(distanceUS);
-    Serial.println(" cm");
-    stopEngine();
-  } else {
-    Serial.print(distanceUS);
-    Serial.println(" cm");
-    forwardEngine();
-  }
+  return distanceUS;
 }
-
-void forwardEngine(){ 
-  digitalWrite(LEFT_FRONT_FORWARD , LOW);
-  digitalWrite(LEFT_FRONT_BACKWARD , HIGH);
-  
-  digitalWrite(RIGHT_FRONT_FORWARD , LOW);
-  digitalWrite(RIGHT_FRONT_BACKWARD , HIGH);
-  
-  digitalWrite(LEFT_BACK_FORWARD , LOW);
-  digitalWrite(LEFT_BACK_BACKWARD , HIGH);
-  
-  digitalWrite(RIGHT_BACK_FORWARD , LOW);
-  digitalWrite(RIGHT_BACK_BACKWARD , HIGH);
-}
-
-void stopEngine() {
-  digitalWrite(LEFT_FRONT_FORWARD , LOW);
-  digitalWrite(LEFT_FRONT_BACKWARD , LOW);
-  
-  digitalWrite(RIGHT_FRONT_FORWARD , LOW);
-  digitalWrite(RIGHT_FRONT_BACKWARD , LOW);
-  
-  digitalWrite(LEFT_BACK_FORWARD , LOW);
-  digitalWrite(LEFT_BACK_BACKWARD , LOW);
-  
-  digitalWrite(RIGHT_BACK_FORWARD , LOW);
-  digitalWrite(RIGHT_BACK_BACKWARD , LOW);
-}
-
-
