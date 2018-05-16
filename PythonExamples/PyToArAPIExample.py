@@ -1,20 +1,19 @@
 import os
-directory = 'car_controller'
-filename = 'car_controller.ino'
 
 
-def openArduinoFile():
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+def create_arduino_file(filename):
+    filename_parts = filename.split('.ino')
+    if not os.path.exists(filename_parts[0]):
+        os.makedirs(filename_parts[0])
     global file
-    file = open(directory + '/' + filename, "w+")
+    file = open(filename_parts[0] + '/' + filename_parts[0] + '.ino', "w+")
 
-def endArduinoFile():
-    checkFile()
+def end_arduino_file():
+    check_file()
     file.close()
 
 def setup():
-    checkFile()
+    check_file()
     file.write('void setup() {\n')
     file.write('pinMode(LEFT_FRONT_FORWARD, OUTPUT);\n')
     file.write('pinMode(LEFT_FRONT_BACKWARD, OUTPUT);\n')
@@ -30,8 +29,8 @@ def setup():
     file.write('}\n')
 
 
-def defineEngines():
-    checkFile()
+def define_engines():
+    check_file()
     file.write('const int LEFT_FRONT_FORWARD = 5;\n')
     file.write('const int LEFT_FRONT_BACKWARD = 4;\n')
     file.write('const int RIGHT_FRONT_FORWARD = 2;\n')
@@ -42,8 +41,8 @@ def defineEngines():
     file.write('const int RIGHT_BACK_BACKWARD = 12;\n')
 
 
-def setEngines():
-    checkFile()
+def set_engines():
+    check_file()
     file.write('void setEngines(int leftFrontForward, int leftFrontBackward, int rightForntForward, int rightFrontBackward, '
                'int leftBackForward, int leftBackBackward, int rightBackForward, int rightBackBackward) {\n')
     file.write('digitalWrite(LEFT_FRONT_FORWARD , leftFrontForward);\n')
@@ -56,14 +55,14 @@ def setEngines():
     file.write('digitalWrite(RIGHT_BACK_BACKWARD , rightBackBackward);\n')
     file.write('}\n')
 
-def defineUS():
-    checkFile()
+def define_US():
+    check_file()
     file.write('const int echoUS = A5;\n')
     file.write('const int triggerUS= A4;\n')
     file.write('unsigned int timeUS, distanceUS = 50;\n')
 
-def getUS():
-    checkFile()
+def get_US():
+    check_file()
     file.write('int getUS() {\n')
     file.write('digitalWrite(triggerUS, LOW);\n')
     file.write('delayMicroseconds(2);\n')
@@ -76,7 +75,7 @@ def getUS():
     file.write('}\n')
 
 def loop():
-    checkFile()
+    check_file()
     file.write('void loop() {\n')
     file.write('int distanceUS = getUS();\n')
     file.write('if (distanceUS < 10) {\n')
@@ -88,8 +87,8 @@ def loop():
     file.write('}\n')
     file.write('}\n')
 
-def checkFile():
+def check_file():
     try:
         file
     except NameError:
-        openArduinoFile()
+        create_arduino_file('ardu')
