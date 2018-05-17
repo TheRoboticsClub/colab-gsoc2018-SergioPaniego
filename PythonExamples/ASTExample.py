@@ -12,11 +12,27 @@ import ast
 
 class MyVisitor(ast.NodeVisitor):
     def visit_Str(self, node):
-        print('Found String: "' + node.s + '"')
+        print('Found String: "' + str(node) + '"')
     def visit_Name(self, node):
-        print('Name: ' + node.id)
+        print(' --- Name: ' + node.id)
     def visit_FunctionDef(self, node):
         print('Function Definition: ' + str(node.name))
+        for node in node.body:
+            if isinstance(node, ast.Str):
+                self.visit_Str(node)
+            elif isinstance(node, ast.Expr):
+                self.visit_Expr(node)
+            elif isinstance(node, ast.Assign):
+                self.visit_Assign(node)
+    def visit_Expr(self, node):
+        print(' - Expression: ' + str(node.value))
+        self.visit_Call(node.value)
+    def visit_Call(self, node):
+        print(' -- Call: ' + str(node.func))
+        self.visit_Name(node.func)
+    def visit_Assign(self, node):
+        print(' -- Assign: ' + str(node.value))
+
 
 class MyTransformer(ast.NodeTransformer):
     def visit_Str(self, node):
