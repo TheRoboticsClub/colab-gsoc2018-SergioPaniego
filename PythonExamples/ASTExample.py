@@ -15,6 +15,7 @@ class MyVisitor(ast.NodeVisitor):
         print('Found String: "' + str(node) + '"')
     def visit_Name(self, node):
         print(' --- Name: ' + node.id)
+        self.visit_Load(node.ctx)
     def visit_FunctionDef(self, node):
         print('Function Definition: ' + str(node.name))
         for node in node.body:
@@ -32,6 +33,12 @@ class MyVisitor(ast.NodeVisitor):
         self.visit_Name(node.func)
     def visit_Assign(self, node):
         print(' -- Assign: ' + str(node.value))
+    def visit_Load(self, node):
+        tuple = node._fields
+        try:
+            print(' ---- Load: ' + tuple[0])
+        except IndexError:
+            print(' ---- Load: ' + str(tuple))
 
 
 class MyTransformer(ast.NodeTransformer):
