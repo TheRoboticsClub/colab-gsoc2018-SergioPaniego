@@ -61,7 +61,7 @@ class MyVisitor(ast.NodeVisitor):
     def visit_Call(self, node, depth):
         depth = depth + 1
         separator = ' ' + depth * '-'
-        print(' -- Call: ' + str(node.func))
+        print(separator + ' Call: ' + str(node.func))
         self.visit_Name(node.func ,depth)
         self.visit_Str(node.args, depth)
 
@@ -74,11 +74,11 @@ class MyVisitor(ast.NodeVisitor):
                     self.visit_If(nod, depth)
                 else:
                     self.visit_Name(nod.targets, depth)
-                    print(' -- Assign: ' + str(nod.value))
+                    print(separator + ' Assign: ' + str(nod.value))
                     self.visit_Call(nod.value, depth)
         else:
             self.visit_Name(node.targets, depth)
-            print(' -- Assign: ' + str(node.value))
+            print(separator + ' Assign: ' + str(node.value))
             self.visit_Num(node.value, depth)
 
     def visit_Num(self, node, depth):
@@ -143,7 +143,6 @@ class MyVisitor(ast.NodeVisitor):
         self.visit_Compare(node.test, depth)
         for body_part in node.body:
             if isinstance(body_part, ast.Expr):
-                # print(separator + ' If')
                 self.visit_Expr(body_part, depth)
         for or_else_part in node.orelse:
             if isinstance(or_else_part, ast.If):
