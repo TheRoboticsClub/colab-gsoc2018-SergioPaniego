@@ -2,9 +2,9 @@
     This is an small example that aims to show how the workflow of ast is so we can study the suitability of this
     library for the project we will be working on
 
-    On this example, we take the previous CarController.py development and we work on it.
+    On this example, we take the previous CarController.py development and we work over it.
     We have defined two classes here:
-        - MyVisitor: When calling visit  Takes the nodes that have been previously parsed using ast and print them
+        - MyVisitor: When calling, visit takes the nodes that have been previously parsed using ast and print them
         - MyTransformer: Once visit in called, uses the parsed nodes and transform them as specified
         in the visit_Str function. This is useful to add prefixes or suffixes on featured nodes for example
 '''
@@ -16,7 +16,7 @@ class MyVisitor(ast.NodeVisitor):
         print('KEYWORD')
 
     def visit_Str(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         for text in node:
             if isinstance(text, ast.Call):
@@ -25,7 +25,7 @@ class MyVisitor(ast.NodeVisitor):
                 print(separator + ' Found String: "' + text.s + '"')
 
     def visit_Name(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         if isinstance(node, list):
             for name in node:
@@ -47,8 +47,23 @@ class MyVisitor(ast.NodeVisitor):
             elif isinstance(node, ast.While):
                 self.visit_While(node, depth)
 
-    def visit_Expr(self, node, depth):
-        depth = depth + 1
+    def visit_Expr(self, node=None, depth=None):
+        if depth is None:
+            self.general_visit_Expr(node)
+        else:
+            self.depth_visit_Expr(node ,depth)
+
+    def general_visit_Expr(self, node):
+        if isinstance(node, list):
+            for nod in node:
+                print(' Expression: ' + str(nod.value))
+                self.visit_Call(nod.value, 0)
+        else:
+            print(' Expression: ' + str(node.value))
+            self.visit_Call(node.value, 0)
+
+    def depth_visit_Expr(self, node, depth):
+        depth += 1
         separator = ' ' + depth * '-'
         if isinstance(node, list):
             for nod in node:
@@ -59,14 +74,14 @@ class MyVisitor(ast.NodeVisitor):
             self.visit_Call(node.value, depth)
 
     def visit_Call(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         print(separator + ' Call: ' + str(node.func))
         self.visit_Name(node.func ,depth)
         self.visit_Str(node.args, depth)
 
     def visit_Assign(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         if isinstance(node, list):
             for nod in node:
@@ -82,7 +97,7 @@ class MyVisitor(ast.NodeVisitor):
             self.visit_Num(node.value, depth)
 
     def visit_Num(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         if isinstance(node, list):
             for nod in node:
@@ -93,14 +108,14 @@ class MyVisitor(ast.NodeVisitor):
             print(separator + ' Num: ' + str(node.n))
 
     def visit_While(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         print(separator + ' While: ' + str(node.test))
         self.visit_Compare(node.test, depth)
         self.visit_Try(node.body, depth)
 
     def visit_Try(self, nodes, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         for node in nodes:
             if isinstance(node, ast.Expr):
@@ -112,7 +127,7 @@ class MyVisitor(ast.NodeVisitor):
                 self.visit_ExceptHandler(node.handlers, depth)
 
     def visit_ExceptHandler(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         print(separator + ' ExceptHandler: ' + str(node[0].type))
         self.visit_Name(node[0].type, depth)
@@ -120,12 +135,12 @@ class MyVisitor(ast.NodeVisitor):
         self.visit_Expr(node[0].body, depth)
 
     def visit_arguments(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         print(separator + ' arguments: ' + str(node.args))
 
     def visit_Compare(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         print(separator + ' Comparision')
         self.visit_Name(node.left, depth)
@@ -133,12 +148,12 @@ class MyVisitor(ast.NodeVisitor):
         self.visit_Num(node.comparators, depth)
 
     def visitGt(self, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         print(separator + ' Greater than')
 
     def visit_If(self, node, depth):
-        depth = depth + 1
+        depth += 1
         separator = ' ' + depth * '-'
         self.visit_Compare(node.test, depth)
         for body_part in node.body:
