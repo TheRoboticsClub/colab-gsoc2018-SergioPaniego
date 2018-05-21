@@ -15,114 +15,143 @@ class MyVisitor(ast.NodeVisitor):
     def visit_keyword(self, node):
         print('KEYWORD')
 
-    def visit_Str(self, node):
+    def visit_Str(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         for text in node:
             if isinstance(text, ast.Call):
-                self.visit_Call(text)
+                self.visit_Call(text, depth)
             else:
-                print('Found String: "' + text.s + '"')
+                print(separator + ' Found String: "' + text.s + '"')
 
-    def visit_Name(self, node):
+    def visit_Name(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         if isinstance(node, list):
             for name in node:
-                print(' --- Name: ' + name.id)
+                print(separator + ' Name: ' + name.id)
         else:
-            print(' --- Name: ' + node.id)
+            print(separator + ' Name: ' + node.id)
 
     def visit_FunctionDef(self, node):
+        depth = 0
         print('Function Definition: ' + str(node.name))
-        self.visit_arguments(node.args)
+        self.visit_arguments(node.args, depth)
         for node in node.body:
             if isinstance(node, ast.Str):
-                self.visit_Str(node)
+                self.visit_Str(node, depth)
             elif isinstance(node, ast.Expr):
-                self.visit_Expr(node)
+                self.visit_Expr(node, depth)
             elif isinstance(node, ast.Assign):
-                self.visit_Assign(node)
+                self.visit_Assign(node, depth)
             elif isinstance(node, ast.While):
-                self.visit_While(node)
+                self.visit_While(node, depth)
 
-    def visit_Expr(self, node):
+    def visit_Expr(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         if isinstance(node, list):
             for nod in node:
-                print(' ---- Expression: ' + str(nod.value))
-                self.visit_Call(nod.value)
+                print(separator + ' Expression: ' + str(nod.value))
+                self.visit_Call(nod.value, depth)
         else:
-            print(' - Expression: ' + str(node.value))
-            self.visit_Call(node.value)
+            print(separator + ' Expression: ' + str(node.value))
+            self.visit_Call(node.value, depth)
 
-    def visit_Call(self, node):
+    def visit_Call(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         print(' -- Call: ' + str(node.func))
-        self.visit_Name(node.func)
-        self.visit_Str(node.args)
+        self.visit_Name(node.func ,depth)
+        self.visit_Str(node.args, depth)
 
-    def visit_Assign(self, node):
+    def visit_Assign(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         if isinstance(node, list):
             for nod in node:
                 if isinstance(nod, ast.If):
-                    self.visit_If(nod)
+                    self.visit_If(nod, depth)
                 else:
-                    print(' -- Assign Targets: ' + str(nod.targets))
-                    self.visit_Name(nod.targets)
+                    self.visit_Name(nod.targets, depth)
                     print(' -- Assign: ' + str(nod.value))
-                    self.visit_Call(nod.value)
+                    self.visit_Call(nod.value, depth)
         else:
-            print(' -- Assign Targets: ' + str(node.targets))
-            self.visit_Name(node.targets)
+            self.visit_Name(node.targets, depth)
             print(' -- Assign: ' + str(node.value))
-            self.visit_Num(node.value)
+            self.visit_Num(node.value, depth)
 
-    def visit_Num(self, node):
+    def visit_Num(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         if isinstance(node, list):
             for nod in node:
-                print(' --- Num: ' + str(nod.n))
+                print(separator + ' Num: ' + str(nod.n))
         elif isinstance(node, ast.UnaryOp):
-            print(' --- UnaryOp: ')
+            print(separator + ' UnaryOp: ')
         else:
-            print(' --- Num: ' + str(node.n))
+            print(separator + ' Num: ' + str(node.n))
 
-    def visit_While(self, node):
-        print(' - While: ' + str(node.test))
-        self.visit_Compare(node.test)
-        self.visit_Try(node.body)
+    def visit_While(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
+        print(separator + ' While: ' + str(node.test))
+        self.visit_Compare(node.test, depth)
+        self.visit_Try(node.body, depth)
 
-    def visit_Try(self, nodes):
+    def visit_Try(self, nodes, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
         for node in nodes:
             if isinstance(node, ast.Expr):
-                self.visit_Expr(node)
+                print(separator + ' Try: ')
+                self.visit_Expr(node, depth)
             elif isinstance(node, ast.Try):
-                self.visit_Assign(node.body)
-                print(' -- Try: ' + str(node.handlers))
-                self.visit_ExceptHandler(node.handlers)
+                print(separator + ' Try: ')
+                self.visit_Assign(node.body, depth)
+                self.visit_ExceptHandler(node.handlers, depth)
 
-    def visit_ExceptHandler(self, node):
-        print(' --- ExceptHandler: ' + str(node[0].type))
-        self.visit_Name(node[0].type)
-        print(' --- ExceptHandler: ' + str(node[0].body))
-        self.visit_Expr(node[0].body)
+    def visit_ExceptHandler(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
+        print(separator + ' ExceptHandler: ' + str(node[0].type))
+        self.visit_Name(node[0].type, depth)
+        print(separator + ' ExceptHandler: ' + str(node[0].body))
+        self.visit_Expr(node[0].body, depth)
 
-    def visit_arguments(self, node):
-        print(' - arguments: ' + str(node.args))
+    def visit_arguments(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
+        print(separator + ' arguments: ' + str(node.args))
 
-    def visit_Compare(self, node):
-        print('Comparision')
-        self.visit_Name(node.left)
-        self.visitGt()
-        self.visit_Num(node.comparators)
+    def visit_Compare(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
+        print(separator + ' Comparision')
+        self.visit_Name(node.left, depth)
+        self.visitGt(depth)
+        self.visit_Num(node.comparators, depth)
 
-    def visitGt(self):
-        print(' --- Greater than')
+    def visitGt(self, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
+        print(separator + ' Greater than')
 
-    def visit_If(self, node):
-        self.visit_Compare(node.test)
+    def visit_If(self, node, depth):
+        depth = depth + 1
+        separator = ' ' + depth * '-'
+        self.visit_Compare(node.test, depth)
         for body_part in node.body:
             if isinstance(body_part, ast.Expr):
-                self.visit_Expr(body_part)
+                # print(separator + ' If')
+                self.visit_Expr(body_part, depth)
         for or_else_part in node.orelse:
             if isinstance(or_else_part, ast.If):
-                self.visit_If(or_else_part)
+                print(separator + ' ElIf')
+                self.visit_If(or_else_part, depth)
             elif isinstance(or_else_part, ast.Expr):
-                self.visit_Expr(or_else_part)
+                print(separator + ' Else')
+                self.visit_Expr(or_else_part, depth)
 
 
 class MyTransformer(ast.NodeTransformer):
