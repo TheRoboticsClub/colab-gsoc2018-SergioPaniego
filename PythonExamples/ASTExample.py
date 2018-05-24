@@ -12,16 +12,15 @@ import ast
 
 
 class MyVisitor(ast.NodeVisitor):
-    def visit_keyword(self, node):
-        print('KEYWORD')
-
     def visit_Str(self, node, depth):
         depth += 1
         separator = ' ' + depth * '-'
         for text in node:
             if isinstance(text, ast.Call):
                 self.visit_Call(text, depth)
-            else:
+            elif isinstance(text, ast.Num):
+                self.visit_Num(text, depth)
+            elif isinstance(text, ast.Str):
                 print(separator + ' Found String: "' + text.s + '"')
 
     def visit_Name(self, node, depth):
@@ -30,6 +29,8 @@ class MyVisitor(ast.NodeVisitor):
         if isinstance(node, list):
             for name in node:
                 print(separator + ' Name: ' + name.id)
+        elif isinstance(node, ast.Add):
+            print(separator + ' Add: ' + str(node))
         else:
             print(separator + ' Name: ' + node.id)
 
@@ -46,6 +47,10 @@ class MyVisitor(ast.NodeVisitor):
                 self.visit_Assign(node, depth)
             elif isinstance(node, ast.While):
                 self.visit_While(node, depth)
+            elif isinstance(node, ast.Return):
+                self.visit_Return(node, depth)
+            else:
+                print(node)
 
     def visit_Expr(self, node=None, depth=None):
         if depth is None:
@@ -167,6 +172,20 @@ class MyVisitor(ast.NodeVisitor):
                 print(separator + ' Else')
                 self.visit_Expr(or_else_part, depth)
 
+    def visit_Return(self, node, depth):
+        depth += 1
+        separator = ' ' + depth * '-'
+        if isinstance(node.value, ast.BinOp):
+            self.visit_BinOp(node.value, depth)
+        else:
+            print(separator + node.value)
+    def visit_BinOp(self, node, depth):
+        depth += 1
+        separator = ' ' + depth * '-'
+        print(separator + ' BinOp')
+        self.visit_Name(node.left, depth)
+        self.visit_Name(node.op, depth)
+        self.visit_Name(node.right, depth)
 
 class MyTransformer(ast.NodeTransformer):
     def visit_Str(self, node):
@@ -174,7 +193,7 @@ class MyTransformer(ast.NodeTransformer):
 
 
 # First part: prints the nodes retrieved by the parsed after transform them
-controller_file = open('CarController.py').read()
+controller_file = open('example.py').read()
 car_controller = ast.parse(controller_file)
 MyTransformer().visit(car_controller)
 MyVisitor().visit(car_controller)
@@ -186,5 +205,5 @@ print()
     compile, it excepts this attributes to be set. 
     After that we call exec and can actually execute the python file
 '''
-car_controller = ast.fix_missing_locations(car_controller)
-exec(compile(car_controller, '<string>', 'exec'))
+# car_controller = ast.fix_missing_locations(car_controller)
+# exec(compile(car_controller, '<string>', 'exec'))
